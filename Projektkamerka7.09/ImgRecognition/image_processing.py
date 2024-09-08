@@ -3,6 +3,7 @@ import easyocr as ocr
 from matplotlib import pyplot as plt
 import numpy as np
 import os
+import torch
 
 IMGPATH = os.path.join(os.getcwd(), 'imgs', 'notice.jpg')
 
@@ -14,7 +15,17 @@ def findPlate(img: cv.Mat):
 def getTextFromImg(img: cv.Mat):
 	pass
 
-reader = ocr.Reader(['en'], gpu=False)
-result = reader.readtext(IMGPATH)
+result = 0
+try:
+	reader = ocr.Reader(['en'], gpu=False)
+except Exception as e:
+	print(e)
+
+try:
+	result = reader.readtext(IMGPATH)
+except Exception as e:
+	print(e)
 
 print(result)
+
+print(2)
