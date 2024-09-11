@@ -1,2 +1,3 @@
-import cv2 as cv
+import os
+print(os.listdir('ImgRecognition\\imgs'))
 
