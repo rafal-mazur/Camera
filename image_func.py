@@ -2,106 +2,100 @@
 import cv2 as cv
 import numpy as np
 import os
+from matplotlib import pyplot as plt
+from matplotlib import patches as patch
 
-def get_all(data_root: str,
-            show_labels: bool = True) -> tuple[str, tuple[int, float, float, float, float], np.ndarray] | np.ndarray:
+
+def image_generator(data_root: str,
+                    bOnline: bool = False,
+                    random_mode: bool = False,
+                    n_imgs: int = 1) -> tuple[str, np.ndarray]:
+
+    if bOnline:
+        # Use camera
+        pass
+
+    else:
+        # Get all images' names in directory
+        images_names = os.listdir(data_root)
+
+        # Choose n_imgs random images if necessary
+        if random_mode:
+            images_names = np.random.choice(images_names, size=n_imgs, replace=False)
+
+        # Iterate through images' names and return image
+        for img_name in images_names:
+            # Remove extension
+            yield img_name.removesuffix('.jpg'), cv.imread(os.path.join(data_root, img_name))
+
+
+def read_bbox(bboxes_root: str, bbox_name: str, image_dim=(640,640)) -> patch.Rectangle:
+    """Reads bbox for given image"""
+    with open(os.path.join(bboxes_root, bbox_name + '.txt')) as bbox_data:
+        tup = bbox_data.readline().split()
+    bbox_data.close()
+    x_centre = int(float(tup[1]) * image_dim[0])
+    y_centre = int(float(tup[2]) * image_dim[1])
+    width = int(float(tup[3]) * image_dim[0])
+    height = int(float(tup[4]) * image_dim[1])
+
+
+    return patch.Rectangle(xy=(x_centre - width // 2, y_centre - height // 2),
+                           width=width,
+                           height=height,
+                           edgecolor='g',
+                           linewidth=1,
+                           facecolor='none')
+
+
+def draw_samples(images_path: str,
+                 labels_path: str,
+                 n_rows: int = 3,
+                 n_cols: int = 4,
+                 bbox_show: bool = True) -> None:
     """
-    Generator, iterate through it to get all images one by one
+    Draw samples from dataset
+    Number of images is n_rows * n_cols
 
     Parameters
     ----------
-    data_root str:
-        path to folder (dataset) with folders of images and labels
+    images_path str:
+        path to images folder
 
-    show_labels bool, optional:
-        return image or image with labels
+    labels_path str:
+        path to labels folder
 
-    Returns
-    -------
-    Tuple (img_name, img_label, image as np.ndarray) if show_labels = True
-    or
-    Image as np.ndarray
-    """
+    n_rows int:
+        Number of rows of images on plot
 
-    # Paths to labels' and images' folders
-    IMGS_PATH = os.path.join(data_root, 'images')
-    LABELS_PATH = os.path.join(data_root, 'labels')
+    n_cols int:
+        Number of columns of images on plot
 
-    # Get all images' names in directory
-    images_names = os.listdir(data_root)
-    labels_names = [image_name.replace('.jpg', '.txt') for image_name in images_names]
-
-    # Iterate through images' names
-    for img_name, label_name in zip(images_names, labels_names):
-        if show_labels:
-            # Get label content
-            with open(os.path.join(LABELS_PATH, label_name)) as label:
-                tmp_tuple = label.readline().split()
-            label.close()
-            label_content = (int(tmp_tuple[0]),      # Class type
-                             float(tmp_tuple[1]),    # x_centre
-                             float(tmp_tuple[2]),    # y_centre
-                             float(tmp_tuple[3]),    # width
-                             float(tmp_tuple[4]))   # height
-            # Return labelled image
-            yield img_name, label_content, cv.imread(os.path.join(IMGS_PATH, img_name))
-        else:
-            # Return only image
-            yield cv.imread(os.path.join(IMGS_PATH, img_name))
-
-
-def random(data_root: str,
-           n_imgs: int = 1,
-           show_labels: bool = False) -> tuple[str, tuple[int, float, float, float, float], np.ndarray] | np.ndarray:
-    """
-    Generator, iterate through it to get all images one by one
-
-    Parameters
-    ----------
-    data_root str:
-        path to folder (dataset) with folders of images and labels
-
-    n_imgs int:
-        number of images to return
-
-    show_labels bool, optional:
-        return image or image with labels
+    bbox_show bool:
+        Show with or without bounding boxes
 
     Returns
     -------
-    if show_labels = True
-    tuple[img_name, img_label as tuple[object class: int, x_centre: float, y_centre: float, width: float, height: float], image as np.ndarray]
-
-    if show_labels == False
-    image as np.ndarray
-
-
+    None
     """
 
-    # Paths to labels' and images' folders
-    IMGS_PATH = os.path.join(data_root, 'images')
-    LABELS_PATH = os.path.join(data_root, 'labels')
+    # TODO: jak znajdywać liczby całk. żeby ich stosunek był jak najbliższy podanemu?
+    # TODO: chcemy zamienić n_rows i n_cols na jedno n_samples
+    # Create a figure
+    fig, tmp_axs = plt.subplots(figsize=(12,6), nrows=n_rows, ncols=n_cols)
 
-    # Get all images' names in directory
-    images_names = os.listdir(IMGS_PATH)
+    # Flatten axs list
+    axs = [i for j in tmp_axs for i in j]
 
-    # Create random subset of images_names
-    random_images_names = np.random.choice(images_names, size=n_imgs, replace=False)
-    random_labels_names = [name.rstrip('.jpg')+'.txt' for name in random_images_names]
+    del tmp_axs
 
-    # Iterate through images' names
-    for img_name, label_name in zip(random_images_names, random_labels_names):
-        if show_labels:
-            # Get labels content
-            with open(os.path.join(LABELS_PATH, label_name)) as label:
-                tmp_tuple = label.readline().split()
-            label.close()
-            x_centre = float(tmp_tuple[1])
-            y_centre = float(tmp_tuple[2])
-            width = float(tmp_tuple[3])
-            height = float(tmp_tuple[4])
-            # Return labelled image
-            yield img_name, x_centre, y_centre, width, height, cv.imread(os.path.join(IMGS_PATH, img_name))
-        else:
-            # Return only image
-            yield cv.imread(os.path.join(IMGS_PATH,img_name))
+    # Iterate through axs
+    for ax in axs:
+        image_name, image = next(image_generator(images_path, random_mode= True, n_imgs=n_cols*n_cols))
+        ax.imshow(image)
+        if bbox_show:
+            img_dim = (len(image), len(image[0]))
+            bbox: patch.Rectangle = read_bbox(labels_path, image_name, img_dim)
+            ax.add_patch(bbox)
+
+    plt.show()
