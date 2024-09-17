@@ -1,5 +1,5 @@
 # Functions to use to handle image loading and processing
-import cv2 as cv
+import cv2
 import numpy as np
 import os
 from matplotlib import pyplot as plt
@@ -10,7 +10,29 @@ def image_generator(data_root: str,
                     bOnline: bool = False,
                     random_mode: bool = False,
                     n_imgs: int = 1) -> tuple[str, np.ndarray]:
+    """
+    Generator, iterate thorough to get all images
+    Parameters
+    ----------
+    data_root
+        path to image folder
 
+    bOnline bool:
+        True: get images from camera
+        False: get images from dataset
+
+    random_mode bool:
+        True: return n_imgs images from direction
+        False: return all images form direction
+
+    n_imgs int:
+        omitted if random_mode == False
+        specify amount of returned images if  random_mode == True
+
+    Returns
+    -------
+    tuple[image_name, image as np.ndarray]
+    """
     if bOnline:
         # Use camera
         pass
@@ -26,14 +48,20 @@ def image_generator(data_root: str,
         # Iterate through images' names and return image
         for img_name in images_names:
             # Remove extension
-            yield img_name.removesuffix('.jpg'), cv.imread(os.path.join(data_root, img_name))
+            yield img_name.removesuffix('.jpg'), cv2.imread(os.path.join(data_root, img_name))
 
 
-def read_bbox(bboxes_root: str, bbox_name: str, image_dim=(640,640)) -> patch.Rectangle:
+def read_bbox(bboxes_root: str,
+              bbox_name: str,
+              image_dim=(640,640),
+              linewidth: int=1,
+              edgecolor: str = 'g') -> patch.Rectangle:
     """Reads bbox for given image"""
+
     with open(os.path.join(bboxes_root, bbox_name + '.txt')) as bbox_data:
         tup = bbox_data.readline().split()
     bbox_data.close()
+
     x_centre = int(float(tup[1]) * image_dim[0])
     y_centre = int(float(tup[2]) * image_dim[1])
     width = int(float(tup[3]) * image_dim[0])
@@ -43,8 +71,8 @@ def read_bbox(bboxes_root: str, bbox_name: str, image_dim=(640,640)) -> patch.Re
     return patch.Rectangle(xy=(x_centre - width // 2, y_centre - height // 2),
                            width=width,
                            height=height,
-                           edgecolor='g',
-                           linewidth=1,
+                           edgecolor=edgecolor,
+                           linewidth=linewidth,
                            facecolor='none')
 
 
@@ -95,7 +123,7 @@ def draw_samples(images_path: str,
         ax.imshow(image)
         if bbox_show:
             img_dim = (len(image), len(image[0]))
-            bbox: patch.Rectangle = read_bbox(labels_path, image_name, img_dim)
+            bbox = read_bbox(labels_path, image_name, img_dim)
             ax.add_patch(bbox)
 
     plt.show()
