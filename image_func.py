@@ -72,7 +72,7 @@ def read_bbox(bboxes_root: str,
     width = int(float(tup[3]) * image_dim[0])
     height = int(float(tup[4]) * image_dim[1])
 
-
+    # To jest w formacie yolo a używamy coco więc bez sensu używać
     return patch.Rectangle(xy=(x_centre - width // 2, y_centre - height // 2),
                            width=width,
                            height=height,
