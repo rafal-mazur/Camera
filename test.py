@@ -1,3 +1,5 @@
-import os
-print(os.listdir('ImgRecognition\\imgs'))
+from detectron2.data import DatasetCatalog
+
+d = DatasetCatalog.list()
+print(d)
 

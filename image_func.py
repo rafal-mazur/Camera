@@ -8,8 +8,8 @@ from matplotlib import patches as patch
 
 def image_generator(data_root: str,
                     bOnline: bool = False,
-                    random_mode: bool = False,
-                    n_imgs: int = 1) -> tuple[str, np.ndarray]:
+                    n_imgs: int | None = None,
+                    return_name: bool = True) -> tuple[str, np.ndarray]:
     """
     Generator, iterate thorough to get all images
     Parameters
@@ -42,13 +42,18 @@ def image_generator(data_root: str,
         images_names = os.listdir(data_root)
 
         # Choose n_imgs random images if necessary
-        if random_mode:
+        if type(n_imgs) == int and n_imgs > 0:
             images_names = np.random.choice(images_names, size=n_imgs, replace=False)
 
+
         # Iterate through images' names and return image
-        for img_name in images_names:
-            # Remove extension
-            yield img_name.removesuffix('.jpg'), cv2.imread(os.path.join(data_root, img_name))
+        if return_name:
+            for img_name in images_names:
+                # Remove extension
+                yield img_name.removesuffix('.jpg'), cv2.imread(os.path.join(data_root, img_name))
+        else:
+            for img_name in images_names:
+                yield cv2.imread(os.path.join(data_root, img_name))
 
 
 def read_bbox(bboxes_root: str,
