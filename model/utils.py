@@ -11,6 +11,27 @@ import matplotlib.pyplot as plt
 import model.const as c
 
 
+class Dataset:
+    def __init__(self, name: str, path: str, metadata: dict, json_annot_file: str) -> None:
+        self.name = name
+        self.path = path
+        self.metadata = metadata
+        self.json_annot_file = json_annot_file
+
+
+    def register(self, replace_if_exists: bool = True) -> None:
+        """Registers dataset in DatasetCatalog"""
+        if self.name not in DatasetCatalog.list():
+            register_coco_instances(self.name, self.metadata, self.json_annot_file, self.path)
+        elif replace_if_exists:
+            DatasetCatalog.remove(self.name)
+            register_coco_instances(self.name, self.metadata, self.json_annot_file, self.path)
+
+
+    def is_registered(self) -> bool:
+        return True if self.name in DatasetCatalog.list() else False
+
+
 def register_dataset(dataset_name: str,
                      images_path: str,
                      annotation_json_file_name: str,
@@ -25,6 +46,10 @@ def register_dataset(dataset_name: str,
     elif replace_if_exists:
         DatasetCatalog.remove(dataset_name)
         register_coco_instances(dataset_name, metadata, annotation_json_file_name, images_path)
+
+
+def dataset_registered(dataset_name: str) -> bool:
+    return True if dataset_name in DatasetCatalog.list() else False
 
 
 def draw_samples(dataset_name, n_samples=1):
@@ -46,13 +71,13 @@ def draw_samples(dataset_name, n_samples=1):
         plt.close(fig)
 
 
-def model_config(model_config_file: str = c.MODEL_CONFIG_FILE,
-                 checkpoint_url: str = c.CHECKPOINT_URL,
-                 train_dataset_name: str = c.TRAIN_DATASET_NAME,
-                 test_dataset_name: str = c.TEST_DATASET_NAME,
-                 num_classes: int = 1,
-                 output_dir: str = c.OUTPUT_DIR,
-                 device: str = c.DEVICE) -> CfgNode:
+def custom_config(model_config_file: str = c.MODEL_CONFIG_FILE,
+                  checkpoint_url: str = c.CHECKPOINT_URL,
+                  train_dataset_name: str = c.TRAIN_DATASET_NAME,
+                  test_dataset_name: str = c.TEST_DATASET_NAME,
+                  num_classes: int = 1,
+                  output_dir: str = c.OUTPUT_DIR,
+                  device: str = c.DEVICE) -> CfgNode:
     """Sets model configuration"""
 
     if device != 'cpu' and device != 'cuda':

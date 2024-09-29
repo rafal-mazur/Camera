@@ -18,4 +18,4 @@ CHECKPOINT_URL: str = 'COCO-Detection/retinanet_R_50_FPN_3x.yaml'
 
 OUTPUT_DIR: str = '.\\output\\Licence_Plate_detection'
 
-CFG_SAVE_PATH: str = '.\\LP_cfg.pickle'
+CFG_SAVE_PATH: str = '.\\config\\LP_cfg.pickle'
