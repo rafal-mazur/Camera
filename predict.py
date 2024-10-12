@@ -1,29 +1,40 @@
+import cv2
 import numpy as np
 from detectron2.engine import DefaultPredictor
-from detectron2.config import CfgNode
+from detectron2.structures.instances import Instances
 from detectron2.utils.visualizer import Visualizer
+
 
 from my_cfg import my_cfg
 from utils import image_generator
-import cv2
 
 
-def predict(img: np.ndarray, cfg: CfgNode | None = None):
-    if cfg is None:
-        cfg = my_cfg()
-        cfg.MODEL.WEIGHTS = 'E:\\Programowanie\\Camera-main\\output\\LP_detection\\model_final.pth'
+def predict_boxes(img: np.ndarray, predictor: DefaultPredictor):
+    outputs =  predictor(img)
+    boxes = []
+    for box in outputs['instances'].pred_boxes.to('cpu'):
+        bbox = box.numpy()
+        bbox = int(bbox[0]), int(bbox[1]), int(bbox[2]), int(bbox[3])
+        boxes.append(bbox)
+
+    return boxes
+
     
-    
-    predictor = DefaultPredictor(cfg)
-    output = predictor(img)
-    v = Visualizer(img[:,:,::-1])
-    v = v.draw_instance_predictions(output['instances'].to('cpu'))
-    processed_img = v.get_image()[:,:,::-1]
-    cv2.imshow('X',processed_img)
-    
-    print(output['instances'])
-    cv2.waitKey(0)
-    
+def get_rois(img: np.ndarray, predictor: DefaultPredictor) -> list[np.ndarray]:
+    boxes = predict_boxes(img, predictor)
+    rois = []
+    for box in boxes:
+        rois.append(img[box[1]: box[3], box[0]:box[2],:])
+        
+    return rois
+
+
 if __name__ == '__main__':
-    for img in image_generator('E:\\Programowanie\\Camera-main\\LicencePlateDataset\\test', n_imgs=1):
-        predict(img)
+    cfg = my_cfg()
+    cfg.MODEL.WEIGHTS = 'E:\\Programowanie\\Camera-main\\models_cfg\\model_0041279.pth'
+    p = DefaultPredictor(cfg)
+    for img in image_generator('E:\\Programowanie\\Camera-main\\LicencePlateDataset\\test', n_imgs=10):
+        for roi in get_rois(img, p):
+            cv2.imshow('iamge', roi)
+            cv2.waitKey(0)
+            

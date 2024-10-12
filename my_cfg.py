@@ -13,19 +13,17 @@ def my_cfg() -> CfgNode:
     cfg = get_cfg()
     
     cfg.merge_from_file(model_zoo.get_config_file(defaults.MODEL_CONFIG_FILE))
-    cfg.MODEL.WEIGHTS = model_zoo.get_checkpoint_url(defaults.MODEL_CONFIG_FILE)
+    cfg.MODEL.WEIGHTS = 'E:\\Programowanie\\Camera-main\\models_cfg\\model_0041279.pth'
     
     if torch.cuda.is_available():
-        print('--Using CUDA--')
         cfg.MODEL.DEVICE = 'cuda' 
     else: 
-        print('--Using CPU--')
         cfg.MODEL.DEVICE = 'cpu'
     
-    # cfg.INPUT.MIN_SIZE_TRAIN = (640,)
-    # cfg.INPUT.MAX_SIZE_TRAIN = 640
-    # cfg.INPUT.MIN_SIZE_TEST = 640
-    # cfg.INPUT.MAX_SIZE_TEST = 640
+    cfg.INPUT.MIN_SIZE_TRAIN = (640,)
+    cfg.INPUT.MAX_SIZE_TRAIN = 640
+    cfg.INPUT.MIN_SIZE_TEST = 640
+    cfg.INPUT.MAX_SIZE_TEST = 640
     cfg.INPUT.RANDOM_FLIP = 'none'
     
     cfg.DATASETS.TRAIN = (defaults.TRAIN_DATASET_NAME,)
@@ -35,18 +33,20 @@ def my_cfg() -> CfgNode:
     cfg.DATALOADER.FILTER_EMPTY_ANNOTATIONS = True
     
     cfg.MODEL.ROI_HEADS.NUM_CLASSES = 1
-    cfg.MODEL.ROI_HEADS.SCORE_THRESH_TEST = 0.01
+    cfg.MODEL.ROI_HEADS.SCORE_THRESH_TEST = 0.8
     cfg.MODEL.ROI_HEADS.BATCH_SIZE_PER_IMAGE = 512
-    cfg.MODEL.RETINANET.NUM_CLASSES = 1
     
-    cfg.SOLVER.MAX_ITER = 15000
+    cfg.MODEL.RETINANET.NUM_CLASSES = 1
+    cfg.MODEL.RETINANET.SCORE_THRESH_TEST  = 0.8
+    
+    cfg.SOLVER.MAX_ITER = 50000
     cfg.SOLVER.BASE_LR = 0.00025
-    cfg.SOLVER.GAMMA = 0.5
-    cfg.SOLVER.STEPS = () 
+    cfg.SOLVER.GAMMA = 0.1
+    cfg.SOLVER.STEPS = (4000, 6000, 10000, 15000, 22500, 30000, 37500, 45000) 
     cfg.SOLVER.IMS_PER_BATCH = 4
     cfg.SOLVER.LR_SCHEDULER_NAME = "WarmupMultiStepLR"
-    cfg.SOLVER.WARMUP_ITERS = int(0.1*cfg.SOLVER.MAX_ITER)
-    cfg.SOLVER.CHECKPOINT_PERIOD = 5
+    cfg.SOLVER.WARMUP_ITERS = int(0.05*cfg.SOLVER.MAX_ITER)
+    cfg.SOLVER.CHECKPOINT_PERIOD = 20
     cfg.SOLVER.REFERENCE_WORLD_SIZE = 1 
     
     cfg.TEST.DETECTIONS_PER_IMAGE = 100 # max 100

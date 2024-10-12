@@ -1,14 +1,2 @@
-import json
-
-with open('E:\\Programowanie\\Camera-main\\LicencePlateDataset\\train_annotations.coco.json') as f:
-    j = json.loads(f.read())
-    annots = j['annotations']
-    imgs = j['images']
-    print(imgs[0])
-    print(annots[0])
-    for annot in annots:
-        for img in imgs:
-            if img['id'] == annot['image_id']:
-                break
-        else:
-            print(1)
+import torch
+print(torch.load('E:\\Programowanie\\Camera-main\\output\\LP_detection\\model_0002384.pth', 'cpu', weights_only=False))

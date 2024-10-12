@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 
 
 
-def draw_samples(dataset_name: str, n_imgs: int = 1, full_screen: bool = False, window_size_inches: tuple[float, float]=(15,8)) -> None:
+def draw_samples(dataset_name: str, n_imgs: int = 1, window_size_inches: tuple[float, float]=(10,6), full_screen: bool = False) -> None:
     """Draws samples from dataset registered in DatasetCatalog from detectron2"""
     
     # dataset info
@@ -22,7 +22,7 @@ def draw_samples(dataset_name: str, n_imgs: int = 1, full_screen: bool = False, 
     
     fig, ax = plt.subplots()
     mngr = plt.get_current_fig_manager() 
-    mngr.window.geometry("+0+0")# type: ignore
+    mngr.window.geometry("+0+0") # type: ignore
     mngr.set_window_title('draw_samples') # type: ignore
     
     for entity in random.sample(dataset, n_imgs):
