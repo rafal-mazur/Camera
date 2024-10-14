@@ -15,4 +15,4 @@ MODEL_CONFIG_FILE: str = 'COCO-Detection/retinanet_R_50_FPN_3x.yaml'
 CHECKPOINT_URL: str = 'COCO-Detection/retinanet_R_50_FPN_3x.yaml'
 
 OUTPUT_DIR: str = '.\\output\\LP_detection'
-CFG_SAVE_PATH: str = '.\\models_cfg'
+CFG_SAVE_DIR: str = '.\\models_cfg'

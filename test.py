@@ -1,2 +1,5 @@
 import torch
-print(torch.load('E:\\Programowanie\\Camera-main\\output\\LP_detection\\model_0002384.pth', 'cpu', weights_only=False))
+
+with open('E:\\Programowanie\\Camera-main\\output\\LP_eval\\instances_predictions.pth', 'rb') as f:
+    a = torch.load(f)
+    print(a)

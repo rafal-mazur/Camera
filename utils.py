@@ -1,8 +1,6 @@
-from detectron2.config import CfgNode, get_cfg
 from detectron2.utils.visualizer import Visualizer
 from detectron2.data import  DatasetCatalog, MetadataCatalog
 from detectron2.data.datasets import register_coco_instances
-from detectron2.model_zoo import model_zoo
 
 import random, cv2, os
 import numpy as np
@@ -25,10 +23,10 @@ def draw_samples(dataset_name: str, n_imgs: int = 1, window_size_inches: tuple[f
     mngr.window.geometry("+0+0") # type: ignore
     mngr.set_window_title('draw_samples') # type: ignore
     
-    for entity in random.sample(dataset, n_imgs):
-        im = cv2.imread(entity['file_name'])
+    for d in random.sample(dataset, n_imgs):
+        im = cv2.imread(d['file_name'])
         v = Visualizer(im[:,:,::-1], metadata=dataset_metadata)
-        v = v.draw_dataset_dict(entity)
+        v = v.draw_dataset_dict(d)
         
         ax.imshow(v.get_image())
         
@@ -83,8 +81,13 @@ def image_generator(data_root: str, bOnline: bool = False, n_imgs: int | None = 
             yield cv2.imread(os.path.join(data_root, img_name))
 
 
+def choose_best_model():
+    pass
+
+
+
+
 if __name__ == '__main__':
     from Dataset import Dataset
     dataset = Dataset('test', 'E:\\Programowanie\\Camera-main\\LicencePlateDataset\\test', {}, 'E:\\Programowanie\\Camera-main\\LicencePlateDataset\\test_annotations.coco.json')
-    dataset.register()
     draw_samples(dataset.name, 20)
