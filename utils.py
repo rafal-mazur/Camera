@@ -27,6 +27,7 @@ def draw_samples(dataset_name: str, n_imgs: int = 1, window_size_inches: tuple[f
         im = cv2.imread(d['file_name'])
         v = Visualizer(im[:,:,::-1], metadata=dataset_metadata)
         v = v.draw_dataset_dict(d)
+        print(d)
         
         ax.imshow(v.get_image())
         

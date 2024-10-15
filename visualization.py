@@ -28,8 +28,13 @@ import torch
 from my_cfg import my_cfg
 
 def inference_frame(frame, predictor) -> None:
-
-    pass
+    outputs = predictor(frame)
+    v = Visualizer(frame[:,:,::-1])
+    v = v.draw_instance_predictions(outputs['instances'].to('gpu'))
+    
+    im = v.get_image()[:,:,::-1]
+    
+    cv2.imshow('prediction', im)
     
  
  
